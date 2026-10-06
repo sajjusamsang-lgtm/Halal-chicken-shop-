@@ -1,0 +1,224 @@
+{
+  "entities": {
+    "Shop": {
+      "title": "Shop",
+      "description": "Shop and owner metadata profile",
+      "type": "object",
+      "properties": {
+        "shopId": { "type": "string" },
+        "ownerId": { "type": "string" },
+        "shopName": { "type": "string" },
+        "ownerName": { "type": "string" },
+        "phone": { "type": "string" },
+        "address": { "type": "string" },
+        "defaultChickenRate": { "type": "number" },
+        "defaultEggTrayRate": { "type": "number" },
+        "invoicePrefix": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["shopId", "ownerId", "shopName", "ownerName"]
+    },
+    "Customer": {
+      "title": "Customer",
+      "description": "Retail or institutional customer ledger profile",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "shopId": { "type": "string" },
+        "name": { "type": "string" },
+        "phone": { "type": "string" },
+        "businessName": { "type": "string" },
+        "customerType": { "type": "string" },
+        "paymentCycle": { "type": "string" },
+        "defaultRate": { "type": "number" },
+        "deliveryDays": { "type": "string" },
+        "totalPending": { "type": "number" },
+        "notes": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "shopId", "name", "customerType"]
+    },
+    "Sale": {
+      "title": "Sale",
+      "description": "Sale bill order with pricing and ledger balance",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "shopId": { "type": "string" },
+        "billNumber": { "type": "string" },
+        "customerId": { "type": "string" },
+        "customerName": { "type": "string" },
+        "customerType": { "type": "string" },
+        "productType": { "type": "string" },
+        "chickenCut": { "type": "string" },
+        "quantityUnit": { "type": "string" },
+        "quantity": { "type": "number" },
+        "piecesCount": { "type": "integer" },
+        "sellingRate": { "type": "number" },
+        "subtotal": { "type": "number" },
+        "discount": { "type": "number" },
+        "finalAmount": { "type": "number" },
+        "costAmount": { "type": "number" },
+        "grossProfit": { "type": "number" },
+        "paymentMethod": { "type": "string" },
+        "paymentStatus": { "type": "string" },
+        "amountPaid": { "type": "number" },
+        "balancePending": { "type": "number" },
+        "saleDate": { "type": "string" },
+        "dueDate": { "type": "string" },
+        "isInstitutionalDelivery": { "type": "boolean" },
+        "isDelivered": { "type": "boolean" },
+        "notes": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "shopId", "customerName", "productType", "finalAmount", "paymentStatus", "paymentMethod"]
+    },
+    "Payment": {
+      "title": "Payment",
+      "description": "Customer payment receipt settling khata",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "shopId": { "type": "string" },
+        "saleId": { "type": "string" },
+        "billNumber": { "type": "string" },
+        "customerId": { "type": "string" },
+        "customerName": { "type": "string" },
+        "amountReceived": { "type": "number" },
+        "previousBalance": { "type": "number" },
+        "remainingBalance": { "type": "number" },
+        "paymentMethod": { "type": "string" },
+        "referenceId": { "type": "string" },
+        "paymentDate": { "type": "string" },
+        "notes": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "shopId", "customerName", "amountReceived", "paymentMethod"]
+    },
+    "ChickenPurchase": {
+      "title": "ChickenPurchase",
+      "description": "Live chicken batch purchase record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "shopId": { "type": "string" },
+        "batchCode": { "type": "string" },
+        "supplierName": { "type": "string" },
+        "supplierPhone": { "type": "string" },
+        "numberOfBirds": { "type": "integer" },
+        "totalLiveWeightKg": { "type": "number" },
+        "avgWeightPerBirdKg": { "type": "number" },
+        "purchaseRatePerKg": { "type": "number" },
+        "purchaseAmount": { "type": "number" },
+        "transportCost": { "type": "number" },
+        "otherCost": { "type": "number" },
+        "totalCost": { "type": "number" },
+        "paymentStatus": { "type": "string" },
+        "paymentMethod": { "type": "string" },
+        "purchaseDate": { "type": "string" },
+        "notes": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "shopId", "supplierName", "numberOfBirds", "totalLiveWeightKg", "purchaseRatePerKg", "totalCost"]
+    },
+    "ProcessingRecord": {
+      "title": "ProcessingRecord",
+      "description": "Processing conversion and yield ratio",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "shopId": { "type": "string" },
+        "batchCode": { "type": "string" },
+        "liveBirdCount": { "type": "integer" },
+        "liveWeightKg": { "type": "number" },
+        "usableChickenWeightKg": { "type": "number" },
+        "wasteOffalWeightKg": { "type": "number" },
+        "otherLossKg": { "type": "number" },
+        "yieldPercentage": { "type": "number" },
+        "lossPercentage": { "type": "number" },
+        "totalBatchCost": { "type": "number" },
+        "costPerUsableKg": { "type": "number" },
+        "processingDate": { "type": "string" },
+        "notes": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "shopId", "liveWeightKg", "usableChickenWeightKg", "yieldPercentage"]
+    },
+    "Expense": {
+      "title": "Expense",
+      "description": "Shop expenditure entry",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "shopId": { "type": "string" },
+        "category": { "type": "string" },
+        "description": { "type": "string" },
+        "amount": { "type": "number" },
+        "paymentMethod": { "type": "string" },
+        "expenseDate": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "shopId", "category", "amount", "paymentMethod"]
+    },
+    "DailyClosing": {
+      "title": "DailyClosing",
+      "description": "Daily register closing summary",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "shopId": { "type": "string" },
+        "date": { "type": "string" },
+        "openingCash": { "type": "number" },
+        "cashSales": { "type": "number" },
+        "cashPaymentsReceived": { "type": "number" },
+        "cashExpenses": { "type": "number" },
+        "closingCash": { "type": "number" },
+        "openingUpi": { "type": "number" },
+        "upiSales": { "type": "number" },
+        "upiReceived": { "type": "number" },
+        "closingUpi": { "type": "number" },
+        "isClosed": { "type": "boolean" },
+        "notes": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "shopId", "date", "closingCash", "closingUpi"]
+    }
+  },
+  "firestore": {
+    "/shops/{shopId}": {
+      "schema": "Shop",
+      "description": "Shop owner profile"
+    },
+    "/shops/{shopId}/customers/{customerId}": {
+      "schema": "Customer",
+      "description": "Customer khata records"
+    },
+    "/shops/{shopId}/sales/{saleId}": {
+      "schema": "Sale",
+      "description": "Sales invoice orders"
+    },
+    "/shops/{shopId}/payments/{paymentId}": {
+      "schema": "Payment",
+      "description": "Customer payment settlements"
+    },
+    "/shops/{shopId}/chickenPurchases/{purchaseId}": {
+      "schema": "ChickenPurchase",
+      "description": "Live bird supplier purchases"
+    },
+    "/shops/{shopId}/processingRecords/{processingId}": {
+      "schema": "ProcessingRecord",
+      "description": "Dressed chicken yield records"
+    },
+    "/shops/{shopId}/expenses/{expenseId}": {
+      "schema": "Expense",
+      "description": "Operational expense vouchers"
+    },
+    "/shops/{shopId}/dailyClosings/{closingId}": {
+      "schema": "DailyClosing",
+      "description": "Daily register closings"
+    }
+  }
+}

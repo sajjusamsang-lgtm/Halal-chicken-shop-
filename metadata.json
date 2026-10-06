@@ -1,0 +1,6 @@
+{
+  "name": "Halal Chicken Shop Hanti",
+  "description": "Owner Management System & Business ERP for Halal Chicken Shop Hanti by Mr. Sajid",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

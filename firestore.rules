@@ -1,0 +1,193 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isShopOwner(shopId) {
+      return isSignedIn() && request.auth.uid == shopId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 100;
+    }
+
+    function isValidTimestamp(val) {
+      return val is timestamp && val <= request.time;
+    }
+
+    function isValidShop(data, shopId) {
+      return data.shopId is string && data.shopId == shopId &&
+             data.ownerId is string && data.ownerId == request.auth.uid &&
+             data.shopName is string && data.shopName.size() > 0 &&
+             data.ownerName is string && data.ownerName.size() > 0 &&
+             (!('phone' in data) || data.phone is string) &&
+             (!('address' in data) || data.address is string) &&
+             (!('createdAt' in data) || isValidTimestamp(data.createdAt)) &&
+             (!('updatedAt' in data) || isValidTimestamp(data.updatedAt));
+    }
+
+    function isValidCustomer(data, shopId) {
+      return data.id is string && data.id.size() > 0 &&
+             data.shopId is string && data.shopId == shopId &&
+             data.name is string && data.name.size() > 0 &&
+             (!('phone' in data) || data.phone is string) &&
+             (!('businessName' in data) || data.businessName is string) &&
+             (!('customerType' in data) || data.customerType is string) &&
+             (!('totalPending' in data) || data.totalPending is number) &&
+             (!('createdAt' in data) || isValidTimestamp(data.createdAt)) &&
+             (!('updatedAt' in data) || isValidTimestamp(data.updatedAt));
+    }
+
+    function isValidSale(data, shopId) {
+      return data.id is string && data.id.size() > 0 &&
+             data.shopId is string && data.shopId == shopId &&
+             data.customerName is string && data.customerName.size() > 0 &&
+             data.finalAmount is number &&
+             data.paymentStatus is string &&
+             data.paymentMethod is string &&
+             (!('billNumber' in data) || data.billNumber is string) &&
+             (!('customerId' in data) || data.customerId is string) &&
+             (!('subtotal' in data) || data.subtotal is number) &&
+             (!('amountPaid' in data) || data.amountPaid is number) &&
+             (!('balancePending' in data) || data.balancePending is number) &&
+             (!('createdAt' in data) || isValidTimestamp(data.createdAt)) &&
+             (!('updatedAt' in data) || isValidTimestamp(data.updatedAt));
+    }
+
+    function isValidPayment(data, shopId) {
+      return data.id is string && data.id.size() > 0 &&
+             data.shopId is string && data.shopId == shopId &&
+             data.customerName is string && data.customerName.size() > 0 &&
+             data.amountReceived is number &&
+             data.paymentMethod is string &&
+             (!('saleId' in data) || data.saleId is string) &&
+             (!('customerId' in data) || data.customerId is string) &&
+             (!('previousBalance' in data) || data.previousBalance is number) &&
+             (!('remainingBalance' in data) || data.remainingBalance is number) &&
+             (!('createdAt' in data) || isValidTimestamp(data.createdAt));
+    }
+
+    function isValidPurchase(data, shopId) {
+      return data.id is string && data.id.size() > 0 &&
+             data.shopId is string && data.shopId == shopId &&
+             data.supplierName is string && data.supplierName.size() > 0 &&
+             data.numberOfBirds is int && data.numberOfBirds >= 0 &&
+             data.totalLiveWeightKg is number && data.totalLiveWeightKg >= 0 &&
+             data.purchaseRatePerKg is number && data.purchaseRatePerKg >= 0 &&
+             data.totalCost is number && data.totalCost >= 0 &&
+             (!('createdAt' in data) || isValidTimestamp(data.createdAt));
+    }
+
+    function isValidProcessing(data, shopId) {
+      return data.id is string && data.id.size() > 0 &&
+             data.shopId is string && data.shopId == shopId &&
+             data.liveWeightKg is number && data.liveWeightKg >= 0 &&
+             data.usableChickenWeightKg is number && data.usableChickenWeightKg >= 0 &&
+             data.yieldPercentage is number &&
+             (!('createdAt' in data) || isValidTimestamp(data.createdAt));
+    }
+
+    function isValidExpense(data, shopId) {
+      return data.id is string && data.id.size() > 0 &&
+             data.shopId is string && data.shopId == shopId &&
+             data.category is string && data.category.size() > 0 &&
+             data.amount is number && data.amount > 0 &&
+             data.paymentMethod is string &&
+             (!('createdAt' in data) || isValidTimestamp(data.createdAt));
+    }
+
+    function isValidDailyClosing(data, shopId) {
+      return data.id is string && data.id.size() > 0 &&
+             data.shopId is string && data.shopId == shopId &&
+             data.date is string &&
+             data.closingCash is number &&
+             data.closingUpi is number &&
+             (!('createdAt' in data) || isValidTimestamp(data.createdAt));
+    }
+
+    match /users/{userId} {
+      allow read, write: if isSignedIn() && request.auth.uid == userId;
+    }
+
+    match /shops/{shopId} {
+      allow get, list: if isShopOwner(shopId);
+      allow create, update: if isShopOwner(shopId) && isValidShop(request.resource.data, shopId);
+      allow delete: if isShopOwner(shopId);
+
+      match /customers/{customerId} {
+        allow get, list: if isShopOwner(shopId);
+        allow create, update: if isShopOwner(shopId) && isValidId(customerId) && isValidCustomer(request.resource.data, shopId);
+        allow delete: if isShopOwner(shopId) && isValidId(customerId);
+      }
+
+      match /sales/{saleId} {
+        allow get, list: if isShopOwner(shopId);
+        allow create, update: if isShopOwner(shopId) && isValidId(saleId) && isValidSale(request.resource.data, shopId);
+        allow delete: if isShopOwner(shopId) && isValidId(saleId);
+      }
+
+      match /payments/{paymentId} {
+        allow get, list: if isShopOwner(shopId);
+        allow create, update: if isShopOwner(shopId) && isValidId(paymentId) && isValidPayment(request.resource.data, shopId);
+        allow delete: if isShopOwner(shopId) && isValidId(paymentId);
+      }
+
+      match /chickenPurchases/{purchaseId} {
+        allow get, list: if isShopOwner(shopId);
+        allow create, update: if isShopOwner(shopId) && isValidId(purchaseId) && isValidPurchase(request.resource.data, shopId);
+        allow delete: if isShopOwner(shopId) && isValidId(purchaseId);
+      }
+
+      match /processingRecords/{processingId} {
+        allow get, list: if isShopOwner(shopId);
+        allow create, update: if isShopOwner(shopId) && isValidId(processingId) && isValidProcessing(request.resource.data, shopId);
+        allow delete: if isShopOwner(shopId) && isValidId(processingId);
+      }
+
+      match /expenses/{expenseId} {
+        allow get, list: if isShopOwner(shopId);
+        allow create, update: if isShopOwner(shopId) && isValidId(expenseId) && isValidExpense(request.resource.data, shopId);
+        allow delete: if isShopOwner(shopId) && isValidId(expenseId);
+      }
+
+      match /eggTransactions/{transactionId} {
+        allow get, list: if isShopOwner(shopId);
+        allow create, update: if isShopOwner(shopId) && isValidId(transactionId);
+        allow delete: if isShopOwner(shopId) && isValidId(transactionId);
+      }
+
+      match /wastage/{wastageId} {
+        allow get, list: if isShopOwner(shopId);
+        allow create, update: if isShopOwner(shopId) && isValidId(wastageId);
+        allow delete: if isShopOwner(shopId) && isValidId(wastageId);
+      }
+
+      match /dailyClosings/{closingId} {
+        allow get, list: if isShopOwner(shopId);
+        allow create, update: if isShopOwner(shopId) && isValidId(closingId) && isValidDailyClosing(request.resource.data, shopId);
+        allow delete: if isShopOwner(shopId) && isValidId(closingId);
+      }
+
+      match /stockMovements/{movementId} {
+        allow get, list: if isShopOwner(shopId);
+        allow create: if isShopOwner(shopId) && isValidId(movementId);
+        allow update, delete: if false;
+      }
+
+      match /settings/{settingId} {
+        allow get, list: if isShopOwner(shopId);
+        allow create, update: if isShopOwner(shopId) && isValidId(settingId);
+        allow delete: if isShopOwner(shopId) && isValidId(settingId);
+      }
+
+      match /auditLogs/{logId} {
+        allow get, list: if isShopOwner(shopId);
+        allow create: if isShopOwner(shopId) && isValidId(logId);
+        allow update, delete: if false;
+      }
+    }
+  }
+}
