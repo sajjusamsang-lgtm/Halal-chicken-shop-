@@ -20,23 +20,23 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Set up Gradle
+      - name: Set up Gradle 9.3.1
         uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: '8.9'
+          gradle-version: '9.3.1'
 
       - name: Find Android project
         id: project
         shell: bash
         run: |
-          echo "Searching for Android Gradle project..."
+          echo "Searching for Android project..."
 
           PROJECT_DIR=$(find . -type f \( -name "settings.gradle" -o -name "settings.gradle.kts" \) -print -quit | xargs dirname)
 
           if [ -z "$PROJECT_DIR" ]; then
             echo "ERROR: No settings.gradle or settings.gradle.kts found."
             echo "Repository contents:"
-            find . -maxdepth 3 -type f | head -200
+            find . -maxdepth 4 -type f | head -300
             exit 1
           fi
 
