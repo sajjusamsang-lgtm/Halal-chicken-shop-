@@ -31,7 +31,10 @@ android {
       keyPassword = System.getenv("KEY_PASSWORD")
     }
     create("debugConfig") {
-      storeFile = file("${rootDir}/debug.keystore")
+      val localDebugKeystore = file("${rootDir}/debug.keystore")
+      if (localDebugKeystore.exists()) {
+        storeFile = localDebugKeystore
+      }
       storePassword = "android"
       keyAlias = "androiddebugkey"
       keyPassword = "android"
@@ -45,11 +48,18 @@ android {
       proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
       signingConfig = signingConfigs.getByName("release")
     }
-    debug { signingConfig = signingConfigs.getByName("debugConfig") }
+    debug {
+      val localDebugKeystore = file("${rootDir}/debug.keystore")
+      signingConfig = if (localDebugKeystore.exists()) {
+        signingConfigs.getByName("debugConfig")
+      } else {
+        signingConfigs.getByName("debug")
+      }
+    }
   }
   compileOptions {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
   }
   buildFeatures {
     compose = true
