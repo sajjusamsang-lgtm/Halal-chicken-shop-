@@ -11,7 +11,7 @@ build:
 runs-on: ubuntu-latest
 
 steps:
-  - name: Checkout updated source code
+  - name: Checkout source
     uses: actions/checkout@v4
 
   - name: Set up Java 17
@@ -20,15 +20,11 @@ steps:
       distribution: temurin
       java-version: '17'
 
-  - name: Set up Gradle
-    uses: gradle/actions/setup-gradle@v4
-
   - name: Find Android project
     id: project
     shell: bash
     run: |
-      FILE=$(find . -type f \( -name settings.gradle -o -name settings.gradle.kts \) \
-        -not -path '*/.gradle/*' | head -n 1)
+      FILE=$(find . -type f \( -name settings.gradle -o -name settings.gradle.kts \) -not -path '*/.gradle/*' | head -n 1)
       if [ -z "$FILE" ]; then
         echo "Android Gradle project not found"
         exit 1
